@@ -1,0 +1,5 @@
+<?php
+$dataHelper = $this->helper('\Cytracon\Core\Helper\Data');
+$element    = $this->getElement();
+?>
+<?= $dataHelper->filter($element->getContent()) ?>

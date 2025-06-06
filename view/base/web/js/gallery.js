@@ -1,0 +1,23 @@
+define([
+    'jquery',
+    'Cytracon_PageBuilder/vendor/fotorama/fotorama',
+    'jquery-ui-modules/widget'
+], function ($, fotorama) {
+    'use strict';
+
+    $.widget('cytracon.gallery', {
+        options: {
+
+        },
+
+        _create: function () {
+            var options = this.options;
+            if (options['thumbheight']) options['thumbheight'] = parseFloat(options['thumbheight']);
+            if (options['thumbwidth']) options['thumbwidth'] = parseFloat(options['thumbwidth']);
+            if (options['thumbmargin']) options['thumbmargin'] = parseFloat(options['thumbmargin']);
+            $(this.element).fotorama(options);
+        }
+    });
+
+    return $.cytracon.gallery;
+});

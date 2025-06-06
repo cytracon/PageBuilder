@@ -1,0 +1,221 @@
+<?php
+use Magento\Framework\App\Action\Action;
+
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$productRepository = $objectManager->create(\Magento\Catalog\Api\ProductRepositoryInterface::class);
+
+$coreHelper = $this->helper('\Cytracon\Core\Helper\Data');
+$compareHelper = $this->helper('Magento\Catalog\Helper\Product\Compare');
+$element = $this->getElement();
+$title = $coreHelper->filter($element->getData('title'));
+$titleAlign = $element->getData('title_align');
+$titleTag = $element->getData('title_tag') ? $element->getData('title_tag') : 'h2';
+$description = $coreHelper->filter($element->getData('description'));
+$showLine = $element->getData('show_line');
+$linePosition = $element->getData('line_position');
+$carouselOptions = $this->getOwlCarouselOptions();
+$lazyLoad = $element->getData('owl_lazyload');
+$items = $this->getItems();
+$imageId = 'category_page_grid'; // This ensures Magento resizes images to the defined dimensions
+$templateType = \Magento\Catalog\Block\Product\ReviewRendererInterface::SHORT_VIEW;
+$showImage = $element->getData('product_image');
+$showName = $element->getData('product_name');
+$showPrice = $element->getData('product_price');
+$showShortDescription = $element->getData('product_shortdescription');
+$showWishlist = $element->getData('product_wishlist');
+$showCompare = $element->getData('product_compare');
+$showCart = $element->getData('product_addtocart');
+$showReview = $element->getData('product_review');
+$swatches = $element->getData('product_swatches');
+$htmlId = $element->getHtmlId();
+$id = time() . uniqid();
+$classes = $this->getOwlCarouselClasses();
+
+// Fetch the placeholder image using the Image Helper
+$imageHelper = $this->helper('Magento\Catalog\Helper\Image');
+$placeholderImage = $imageHelper->getDefaultPlaceholderUrl('image');
+?>
+<div class="mgz-block">
+    <?php if ($title || $description) { ?>
+        <div class="mgz-block-heading mgz-block-heading-align-<?= $titleAlign ?><?= $showLine ? ' mgz-block-heading-line' : '' ?> mgz-block-heading-line-position-<?= $linePosition ?>">
+            <?php if ($title) { ?>
+                <<?= $titleTag ?> class="title"><?= $title ?></<?= $titleTag ?>>
+            <?php } ?>
+            <?php if ($description) { ?>
+                <div class="info"><?= $description ?></div>
+            <?php } ?>
+        </div>
+    <?php } ?>
+    <div class="mgz-block-content">
+        <?php if (count($items)) { ?>
+            <div id="<?= $id ?>" class="mgz-carousel owl-carousel mgz-product-items <?= implode(' ', $classes) ?>">
+                <?php foreach ($items as $_items) { ?>
+                    <div class="item product product-item <?= (count($_items) > 1) ? 'mgz-carousel-multirow' : '' ?>">
+                        <?php foreach ($_items as $_product) { ?>
+                            <div class="product-item-info">
+                                <?php if ($showImage) { ?>
+                                    <?php
+                                    try {
+                                        $_product = $productRepository->getById($_product->getId());
+                                    } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
+                                        continue;
+                                    }
+
+                                    $allImages = $_product->getMediaGalleryImages();
+                                    $firstImageUrl = $placeholderImage;
+                                    $secondImageUrl = null;
+
+                                    if ($allImages && count($allImages) > 0) {
+                                        $i = 0;
+                                        foreach ($allImages as $image) {
+                                            if ($image->getMediaType() === 'image') {
+                                                if ($i === 0) {
+                                                    $firstImageUrl = $image->getUrl();
+                                                } elseif ($i === 1) {
+                                                    $secondImageUrl = $image->getUrl();
+                                                    break;
+                                                }
+                                                $i++;
+                                            }
+                                        }
+                                    }
+
+                                    // If no second image, use the first image to avoid placeholder on hover
+                                    if (!$secondImageUrl) {
+                                        $secondImageUrl = $firstImageUrl;
+                                    }
+                                    ?>
+                                    <a href="<?= $_product->getProductUrl() ?>" class="product photo product-item-photo" tabindex="-1">
+                                        <div class="mgz-product-image-wrapper">
+                                            <?php
+                                            // First image with Magento resizing
+                                            $firstImageHtml = $block->getImage($_product, $imageId, ['src' => $firstImageUrl])->toHtml();
+                                            if ($lazyLoad) {
+                                                $firstImageHtml = str_replace('src="', 'data-original="', $firstImageHtml);
+                                                $firstImageHtml = str_replace('<img', '<img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="', $firstImageHtml);
+                                            }
+                                            $firstImageHtml = str_replace('<img', '<img class="product-image-photo primary-image"', $firstImageHtml);
+                                            ?>
+                                            <?= $firstImageHtml ?>
+                                            <?php
+                                            // Second image with Magento resizing
+                                            $secondImageHtml = $block->getImage($_product, $imageId, ['src' => $secondImageUrl])->toHtml();
+                                            if ($lazyLoad) {
+                                                $secondImageHtml = str_replace('src="', 'data-original="', $secondImageHtml);
+                                                $secondImageHtml = str_replace('<img', '<img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="', $secondImageHtml);
+                                            }
+                                            $secondImageHtml = str_replace('<img', '<img class="product-image-photo hover-image"', $secondImageHtml);
+                                            ?>
+                                            <?= $secondImageHtml ?>
+                                        </div>
+                                    </a>
+                                <?php } ?>
+                                <div class="product details product-item-details">
+                                    <?php if ($showName) { ?>
+                                        <strong class="product-item-name">
+                                            <a title="<?= $block->escapeHtml($_product->getName()) ?>" href="<?= $block->getProductUrl($_product) ?>" class="product-item-link">
+                                                <?= $block->escapeHtml($_product->getName()) ?>
+                                            </a>
+                                        </strong>
+                                    <?php } ?>
+
+                                    <?= $showPrice ? $block->getProductPrice($_product) : '' ?>
+                                    <?= $swatches ? $this->getSwatchesHtml($_product) : '' ?>
+                                    <?= ($templateType && $showReview) ? $block->getReviewsSummaryHtml($_product, $templateType) : '' ?>
+
+                                    <?php if ($showShortDescription) { ?>
+                                        <div class="product-item-shortdescription"><?= $coreHelper->filter($_product->getShortDescription()) ?></div>
+                                    <?php } ?>
+
+                                    <?php if ($showWishlist || $showCompare || $showCart) { ?>
+                                        <div class="product-item-actions">
+                                            <?php if ($showCart && $_product->isSaleable()) { ?>
+                                                <div class="actions-primary">
+                                                    <?php $postParams = $block->getAddToCartPostParams($_product); ?>
+                                                    <form data-role="tocart-form" action="<?= $postParams['action']; ?>" method="post">
+                                                        <input type="hidden" name="product" value="<?= $postParams['data']['product']; ?>">
+                                                        <input type="hidden" name="<?= Action::PARAM_NAME_URL_ENCODED; ?>" value="<?= $postParams['data'][Action::PARAM_NAME_URL_ENCODED]; ?>">
+                                                        <?= $block->getBlockHtml('formkey')?>
+                                                        <button type="submit" title="<?= __('Add to Cart') ?>" class="action tocart primary">
+                                                            <span><?= __('Add to Cart') ?></span>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            <?php } ?>
+                                        </div>
+                                    <?php } ?>
+                                </div>
+                            </div>
+                        <?php } ?>
+                    </div>
+                <?php } ?>
+            </div>
+            <script>
+                require(['jquery', 'Cytracon_Builder/js/carousel'], function($) {
+                    $('#<?= $id ?>').carousel(<?= $coreHelper->serialize($carouselOptions) ?>);
+                });
+            </script>
+        <?php } ?>
+    </div>
+</div>
+
+<!-- Updated CSS for consistent image sizes and hover effect -->
+<style>
+	.mgz-carousel .product-item .product-item-info
+ {
+    width: 300px;
+    height: 300px;
+	margin-bottom: 30px;
+}
+@media (max-width: 600px) {
+  .mgz-carousel .product-item .product-item-info { width: 180px; height: 180px; }
+}
+.mgz-carousel .owl-item .product-item-photo {
+    position: relative;
+    display: block !important;
+    overflow: hidden !important;
+    padding-top: 100% !important; /* Erzwinge quadratisches Format */
+    height: 0 !important;
+}
+
+.mgz-carousel .owl-item .mgz-product-image-wrapper,
+.mgz-carousel .owl-item .mgz-product-image-wrapper .product-image-container,
+.mgz-carousel .owl-item .mgz-product-image-wrapper .product-image-wrapper {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: block !important;
+}
+
+.mgz-carousel .owl-item .mgz-product-image-wrapper img.product-image-photo {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    transition: opacity 0.3s ease-in-out !important;
+}
+
+.mgz-carousel .owl-item .mgz-product-image-wrapper img.primary-image {
+    opacity: 1 !important;
+    z-index: 1 !important;
+}
+
+.mgz-carousel .owl-item .mgz-product-image-wrapper img.hover-image {
+    opacity: 0 !important;
+    z-index: 2 !important;
+}
+
+.mgz-carousel .owl-item:hover .mgz-product-image-wrapper img.primary-image {
+    opacity: 0 !important;
+}
+
+.mgz-carousel .owl-item:hover .mgz-product-image-wrapper img.hover-image {
+    opacity: 1 !important;
+}
+</style>
