@@ -122,7 +122,7 @@ button.mgz-btn {
 .mgz-element .mgz-panel .mgz-panel-heading .mgz-accoridon-icon-triangle,
 .mgz-element .mgz-panel .mgz-panel-heading .mgz-accoridon-icon-dot,
 .mgz-element-categories-list .opener:before {
-  font-family: 'Magezon-Icons' !important;
+  font-family: 'Cytracon-Icons' !important;
   speak: none;
   font-style: normal;
   font-weight: normal;
@@ -1783,7 +1783,7 @@ button.mgz-btn {
   z-index: 1;
   -webkit-font-smoothing: antialiased;
   color: #c7c7c7;
-  font-family: 'Magezon-Icons';
+  font-family: 'Cytracon-Icons';
   font-size: 16px;
   height: 16px;
   letter-spacing: 2px;
@@ -1803,7 +1803,7 @@ button.mgz-btn {
   z-index: 2;
   -webkit-font-smoothing: antialiased;
   color: #ff5501;
-  font-family: 'Magezon-Icons';
+  font-family: 'Cytracon-Icons';
   font-size: 16px;
   height: 16px;
   letter-spacing: 2px;

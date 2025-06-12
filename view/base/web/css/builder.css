@@ -112,7 +112,7 @@ button.mgz-btn {
 .mgz-icon,
 .mgz-builder .product-item .tocompare:before,
 .mgz-builder .product-item .towishlist:before {
-  font-family: 'Magezon-Icons' !important;
+  font-family: 'Cytracon-Icons' !important;
   speak: none;
   font-style: normal;
   font-weight: normal;
@@ -1546,8 +1546,8 @@ body.catalog-product-compare-index .action.print {
 .mgz-element-tab_markers .mgz-element-image.formly-field {
   width: 100px;
 }
-.catalog-product-edit .admin__fieldset > .admin__field > .admin__field-control.magezon-builder-active,
-.catalog-category-edit .admin__fieldset > .admin__field > .admin__field-control.magezon-builder-active {
+.catalog-product-edit .admin__fieldset > .admin__field > .admin__field-control.cytracon-builder-active,
+.catalog-category-edit .admin__fieldset > .admin__field > .admin__field-control.cytracon-builder-active {
   width: 70%;
 }
 .mgz-builder-image_gallery-icon {
@@ -1565,8 +1565,8 @@ body.catalog-product-compare-index .action.print {
 .mgz-builder-call_to_action-icon {
   background-image: url('../images/icons/element-icon-cta.svg') !important;
 }
-.mgz-builder-magezon-icon {
-  background-image: url('../images/icons/magezon-icon.svg') !important;
+.mgz-builder-cytracon-icon {
+  background-image: url('../images/icons/cytracon-icon.svg') !important;
 }
 .mgz-builder-icon-icon {
   background-image: url('../images/icons/element-icon-icon.svg') !important;
