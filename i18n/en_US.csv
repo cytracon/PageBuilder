@@ -15,7 +15,7 @@ Save,Save
 "Edit Template","Edit Template"
 "New Template","New Template"
 Templates,Templates
-"Magezon Page Builder Templates","Magezon Page Builder Templates"
+"Cytracon Page Builder Templates","Cytracon Page Builder Templates"
 "A total of %1 record(s) have been deleted.","A total of %1 record(s) have been deleted."
 "You duplicated the template","You duplicated the template"
 "Widget Title","Widget Title"
@@ -649,8 +649,8 @@ Edit,Edit
 "Delete %1","Delete %1"
 "Are you sure you want to delete a %1 record?","Are you sure you want to delete a %1 record?"
 "WYSIWYG Editor","WYSIWYG Editor"
-"Active Magezon Page Builder","Active Magezon Page Builder"
-"Deactivate Magezon Page Builder","Deactivate Magezon Page Builder"
+"Active Cytracon Page Builder","Active Cytracon Page Builder"
+"Deactivate Cytracon Page Builder","Deactivate Cytracon Page Builder"
 Hour,Hour
 Minute,Minute
 Second,Second
@@ -671,10 +671,10 @@ Tweet,Tweet
 Cancel,Cancel
 Submit,Submit
 Template,Template
-"Magezon Page Builder","Magezon Page Builder"
+"Cytracon Page Builder","Cytracon Page Builder"
 "General Settings","General Settings"
 "Current Version","Current Version"
-"Enable Magezon Page Builder","Enable Magezon Page Builder"
+"Enable Cytracon Page Builder","Enable Cytracon Page Builder"
 "Enable for CMS Pages","Enable for CMS Pages"
 "Enable for Blocks","Enable for Blocks"
 "Enable for Products","Enable for Products"
@@ -701,7 +701,7 @@ Countdown,Countdown
 "Raw JS","Raw JS"
 "Call to Action","Call to Action"
 "Pricing Table","Pricing Table"
-"Magezon Page Builder Template","Magezon Page Builder Template"
+"Cytracon Page Builder Template","Cytracon Page Builder Template"
 "Static Block","Static Block"
 "Contact Form","Contact Form"
 "Single Product","Single Product"

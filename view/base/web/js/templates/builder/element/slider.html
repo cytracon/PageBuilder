@@ -7,7 +7,7 @@
 		<mgz-owl-carousel additional-class="additionalClass" owl-items="owlItems" owl-properties="owlSettings">
 		    <div class="item mgz-carousel-item hover-type-{{ element.hover_effect }}" ng-repeat="item in owlItems" ng-init="$last && finished()">
 		    	<div class="item-inner mgz-flex-position-{{ element.content_position }}">
-					<img class="owl-item-image" alt="{{ item.alt }}" ng-if="item.image" ng-src="{{ $root.magezonBuilderService.getImageUrl(item.image) }}"/>
+					<img class="owl-item-image" alt="{{ item.alt }}" ng-if="item.image" ng-src="{{ $root.cytraconBuilderService.getImageUrl(item.image) }}"/>
 					<div class="item-content" ng-if="item.description && (!element.content_position || element.content_position != 'none')"></div>
 					<div class="item-content" ng-if="(item.title || item.description) && (!element.content_position || element.content_position != 'none')">
 						<div class="item-title" ng-if="item.title" ng-bind-html="getTrustedHtml(item.title)"></div>
