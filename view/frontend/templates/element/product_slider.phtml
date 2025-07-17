@@ -17,7 +17,6 @@ $carouselOptions = $this->getOwlCarouselOptions();
 $lazyLoad = $element->getData('owl_lazyload');
 $items = $this->getItems();
 $imageId = 'category_page_grid'; // This ensures Magento resizes images to the defined dimensions
-$templateType = \Magento\Catalog\Block\Product\ReviewRendererInterface::SHORT_VIEW;
 $showImage = $element->getData('product_image');
 $showName = $element->getData('product_name');
 $showPrice = $element->getData('product_price');
@@ -30,6 +29,11 @@ $swatches = $element->getData('product_swatches');
 $htmlId = $element->getHtmlId();
 $id = time() . uniqid();
 $classes = $this->getOwlCarouselClasses();
+
+// Define templateType with a fallback
+$templateType = defined('\Magento\Catalog\Block\Product\ReviewRendererInterface::SHORT_VIEW') 
+    ? \Magento\Catalog\Block\Product\ReviewRendererInterface::SHORT_VIEW 
+    : 'short';
 
 // Fetch the placeholder image using the Image Helper
 $imageHelper = $this->helper('Magento\Catalog\Helper\Image');
@@ -62,17 +66,17 @@ $placeholderImage = $imageHelper->getDefaultPlaceholderUrl('image');
                                     }
 
                                     $allImages = $_product->getMediaGalleryImages();
-                                    $firstImageUrl = $placeholderImage;
-                                    $secondImageUrl = null;
+                                    $firstImageFile = null;
+                                    $secondImageFile = null;
 
                                     if ($allImages && count($allImages) > 0) {
                                         $i = 0;
                                         foreach ($allImages as $image) {
                                             if ($image->getMediaType() === 'image') {
                                                 if ($i === 0) {
-                                                    $firstImageUrl = $image->getUrl();
+                                                    $firstImageFile = $image->getFile();
                                                 } elseif ($i === 1) {
-                                                    $secondImageUrl = $image->getUrl();
+                                                    $secondImageFile = $image->getFile();
                                                     break;
                                                 }
                                                 $i++;
@@ -80,32 +84,47 @@ $placeholderImage = $imageHelper->getDefaultPlaceholderUrl('image');
                                         }
                                     }
 
-                                    // If no second image, use the first image to avoid placeholder on hover
-                                    if (!$secondImageUrl) {
-                                        $secondImageUrl = $firstImageUrl;
+                                    // If no images, use placeholder
+                                    if (!$firstImageFile) {
+                                        $firstImageFile = '/placeholder/image.jpg'; // Adjust if needed
                                     }
+                                    if (!$secondImageFile) {
+                                        $secondImageFile = $firstImageFile;
+                                    }
+
+                                    // Generate cached URLs using Image Helper
+                                    $imageHelper->init($_product, $imageId)->setImageFile($firstImageFile);
+                                    $firstImageUrl = $imageHelper->getUrl();
+                                    $firstImageWidth = $imageHelper->getWidth();
+                                    $firstImageHeight = $imageHelper->getHeight();
+                                    $firstImageAlt = $block->escapeHtml($_product->getName());
+
+                                    $imageHelper->init($_product, $imageId)->setImageFile($secondImageFile);
+                                    $secondImageUrl = $imageHelper->getUrl();
+                                    $secondImageWidth = $imageHelper->getWidth();
+                                    $secondImageHeight = $imageHelper->getHeight();
+
+                                    // Build HTML for first image
+                                    $firstImageHtml = '<img class="product-image-photo primary-image"';
+                                    if ($lazyLoad) {
+                                        $firstImageHtml .= ' src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" data-amsrc="' . $firstImageUrl . '"';
+                                    } else {
+                                        $firstImageHtml .= ' src="' . $firstImageUrl . '"';
+                                    }
+                                    $firstImageHtml .= ' width="' . $firstImageWidth . '" height="' . $firstImageHeight . '" alt="' . $firstImageAlt . '" />';
+
+                                    // Build HTML for second image
+                                    $secondImageHtml = '<img class="product-image-photo hover-image"';
+                                    if ($lazyLoad) {
+                                        $secondImageHtml .= ' src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" data-amsrc="' . $secondImageUrl . '"';
+                                    } else {
+                                        $secondImageHtml .= ' src="' . $secondImageUrl . '"';
+                                    }
+                                    $secondImageHtml .= ' width="' . $secondImageWidth . '" height="' . $secondImageHeight . '" alt="' . $firstImageAlt . '" />';
                                     ?>
                                     <a href="<?= $_product->getProductUrl() ?>" class="product photo product-item-photo" tabindex="-1">
                                         <div class="mgz-product-image-wrapper">
-                                            <?php
-                                            // First image with Magento resizing
-                                            $firstImageHtml = $block->getImage($_product, $imageId, ['src' => $firstImageUrl])->toHtml();
-                                            if ($lazyLoad) {
-                                                $firstImageHtml = str_replace('src="', 'data-original="', $firstImageHtml);
-                                                $firstImageHtml = str_replace('<img', '<img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="', $firstImageHtml);
-                                            }
-                                            $firstImageHtml = str_replace('<img', '<img class="product-image-photo primary-image"', $firstImageHtml);
-                                            ?>
                                             <?= $firstImageHtml ?>
-                                            <?php
-                                            // Second image with Magento resizing
-                                            $secondImageHtml = $block->getImage($_product, $imageId, ['src' => $secondImageUrl])->toHtml();
-                                            if ($lazyLoad) {
-                                                $secondImageHtml = str_replace('src="', 'data-original="', $secondImageHtml);
-                                                $secondImageHtml = str_replace('<img', '<img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="', $secondImageHtml);
-                                            }
-                                            $secondImageHtml = str_replace('<img', '<img class="product-image-photo hover-image"', $secondImageHtml);
-                                            ?>
                                             <?= $secondImageHtml ?>
                                         </div>
                                     </a>
@@ -121,7 +140,9 @@ $placeholderImage = $imageHelper->getDefaultPlaceholderUrl('image');
 
                                     <?= $showPrice ? $block->getProductPrice($_product) : '' ?>
                                     <?= $swatches ? $this->getSwatchesHtml($_product) : '' ?>
-                                    <?= ($templateType && $showReview) ? $block->getReviewsSummaryHtml($_product, $templateType) : '' ?>
+                                    <?php if ($showReview) { ?>
+                                        <?= $block->getReviewsSummaryHtml($_product, $templateType) ?>
+                                    <?php } ?>
 
                                     <?php if ($showShortDescription) { ?>
                                         <div class="product-item-shortdescription"><?= $coreHelper->filter($_product->getShortDescription()) ?></div>
